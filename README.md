@@ -1,4 +1,4 @@
-# General Header Compression
+# Generic Header Compression
 ## About
 Implementation of 6LoWPAN Generic Compression of Headers and Header-like Payloads
 http://tools.ietf.org/html/draft-bormann-6lowpan-ghc-06
