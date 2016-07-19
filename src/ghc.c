@@ -17,7 +17,7 @@
  * Initiates the dictionary buffer composed out of the pseudo header and a static dictionary
  *
  * @param [out] comp_buf  Buffer where to put the dictionary
- * @param [in]  hdr       56-byte long header
+ * @param [in]  hdr       48-byte long header
  *
  */
 void dictionary_buffer_init(uint8_t* comp_buf, uint8_t* hdr)
@@ -29,28 +29,22 @@ void dictionary_buffer_init(uint8_t* comp_buf, uint8_t* hdr)
     memcpy(&comp_buf[0], &hdr[8], 16);
     /* Copy dst address */
     memcpy(&comp_buf[16], &hdr[24], 16);
-    /* Copy payload size */
-    memcpy(&comp_buf[32], &hdr[2], 4);
-    /* Append 3 nulls */
-    memset(&comp_buf[36], 0x00, 3);
-    /* Copy upper-layer header */
-    memcpy(&comp_buf[39], &hdr[6], 1);
     /* Copy 16 byte static dictionary */
-    memcpy(&comp_buf[40], static_dictionary, 16);
+    memcpy(&comp_buf[32], static_dictionary, 16);
 }
 
 /*
  * Decompresses the payload
  *
  * @param [out] decomp_buf    Buffer where to put the decompressed result
- * @param [in]  hdr           56-byte long header
+ * @param [in]  hdr           48-byte long header
  * @param [in]  comp_buf      Buffer to decompress
  * @param [in]  comp_buf_len  Length of comp_buf
  *
  */
 void decompress(uint8_t *decomp_buf, uint8_t *hdr, uint8_t *comp_buf, int comp_buf_len)
 {
-    int decomp_buf_index = 56;
+    int decomp_buf_index = 48;
     dictionary_buffer_init(decomp_buf, hdr);
     
     int na = 0x00, sa = 0x00;
@@ -90,7 +84,7 @@ void decompress(uint8_t *decomp_buf, uint8_t *hdr, uint8_t *comp_buf, int comp_b
 
     if (DEBUG) {
         printf("--------\n");
-        for (int x = 56; x < decomp_buf_index; x++) {
+        for (int x = 48; x < decomp_buf_index; x++) {
             printf("%02x ", (unsigned char)decomp_buf[x]);
         }
         printf("\n--------\n");
@@ -101,16 +95,16 @@ void decompress(uint8_t *decomp_buf, uint8_t *hdr, uint8_t *comp_buf, int comp_b
  * Compresses the payload
  *  
  * @param [out] comp_buf          Buffer where to put the compressed result
- * @param [in]  hdr               56-byte long header
+ * @param [in]  hdr               48-byte long header
  * @param [in]  payload           Buffer to compress
  * @param [in]  payload_buf_len   Length of payload_buf
  *
  */
 void compress(uint8_t *comp_buf, uint8_t *hdr, uint8_t *payload_buf, int payload_buf_len)
 {
-    uint8_t buffer[56+payload_buf_len];
+    uint8_t buffer[48+payload_buf_len];
     dictionary_buffer_init(buffer, hdr);
-    memcpy(&buffer[56], payload_buf, payload_buf_len);
+    memcpy(&buffer[48], payload_buf, payload_buf_len);
     
     int buffer_index = 0;
     int copy_buffer = 0;
@@ -131,9 +125,9 @@ void compress(uint8_t *comp_buf, uint8_t *hdr, uint8_t *payload_buf, int payload
         int index = 0, index_best = 0;
         int append = 0, append_best = 0;
 
-        for (int dictionary_index = 0; dictionary_index < i+56;) {
+        for (int dictionary_index = 0; dictionary_index < i+48;) {
                 /* First match and not the last byte in payload */
-            if ((payload_index < payload_buf_len) && (append == 0) && (((i+56) - dictionary_index) > 1) &&
+            if ((payload_index < payload_buf_len) && (append == 0) && (((i+48) - dictionary_index) > 1) &&
                 /* Matching pair */
                 ((payload_buf[payload_index] == buffer[dictionary_index]) && (payload_buf[payload_index+1] == buffer[dictionary_index+1]))) {
                 /* Found first matching pair */
@@ -179,7 +173,7 @@ void compress(uint8_t *comp_buf, uint8_t *hdr, uint8_t *payload_buf, int payload
         }
         /* Set back payload point */
         payload_index = i;
-        if ((append_best > zero_sequence) && ((append_best < 3 && (i + 56 - index_best) < 10) || (append_best > 2))) {
+        if ((append_best > zero_sequence) && ((append_best < 3 && (i + 48 - index_best) < 10) || (append_best > 2))) {
             /* Assuming that zeros are in static dic */
            
             /* Stop copy run */
@@ -200,7 +194,7 @@ void compress(uint8_t *comp_buf, uint8_t *hdr, uint8_t *payload_buf, int payload
             uint8_t extended_backref = 0xa0;
             
             int n = append_best - 2;
-            int s = i + 56 - index_best - n;
+            int s = i + 48 - index_best - n;
             int times_n = 0;
             int times_s = 0;
             int rest_n = 0;
