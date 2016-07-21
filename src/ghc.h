@@ -1,10 +1,20 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
- * General Header Compression
+ * @brief General Header Compression
  * Defined in http://tools.ietf.org/html/draft-bormann-6lowpan-ghc-06
  *
  * Software Project in Telematics
  * SS13 Freie Universität Berlin
  *
+ * @author Fares Mokrani
+ * @author Christoffer Hamberg
  */
 
 #ifndef GHC_ghc_h
