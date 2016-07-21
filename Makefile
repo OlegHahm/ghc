@@ -11,3 +11,6 @@ main.o: src/main.c src/ghc.h
 
 clean:
 	rm -f bin/*
+
+check: all
+	bin/ghc_test
